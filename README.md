@@ -44,6 +44,7 @@ Huomioitavaa pisteytksestä:
 -   Liikkuvat osat, level1: Avaruusromu, jota voi tönia asteroideja päin, jotta asteroidit hajoaisivat.
 -   Viholliset: Asteroidit
 -   Näppäimistön ja hiiren käyttö: Pelin luonteen takia hiirtä käytetään vain valikoissa.
+-   Projektin tehtävänannosta jäi hieman epäselväksi, että pitääkö pelin ympärille rakentaa verkkosivu. Jos ei pitänyt, niin toivon sitä, että sivun mahdollisista virheistä ei sakoteta pisteitä.
 
 ## Kuinka projektia ajetaan
 
