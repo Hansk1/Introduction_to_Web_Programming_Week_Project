@@ -708,8 +708,8 @@ class Level2 extends Phaser.Scene {
 
         //Lower the delay:
         if (this.triggerTimer.delay > 400) {
-            this.triggerTimer.delay -= 20;
-            console.log("kissa");
+            this.triggerTimer.delay -= 10;
+            //console.log("kissa");
         }
     }
 
