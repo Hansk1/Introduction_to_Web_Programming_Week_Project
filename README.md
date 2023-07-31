@@ -33,9 +33,10 @@ Omat ominaisuudet:
 
 -   Pelaajan elämäsysteemi 3p
 -   Valikkosysteemi 2p
--   Pelikentän ulkopuolelle menevien objektien poistaminen. (Muistin vapauttaminen) 2p<br>
-    Yhteensä: 34p<br>
-    Omien ominaisuuksien pisteytykset vertaantuvat muiden ominaisuuksien pisteytykseen ja monimutkaisuuteen.<br>
+-   Pelikentän ulkopuolelle menevien objektien poistaminen. (Muistin vapauttaminen) 2p
+
+Yhteensä: 34p<br>
+Omien ominaisuuksien pisteytykset vertaantuvat muiden ominaisuuksien pisteytykseen ja monimutkaisuuteen.
 
 Huomioitavaa pisteytksestä:
 
