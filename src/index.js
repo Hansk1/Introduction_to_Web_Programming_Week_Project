@@ -48,8 +48,13 @@ class Level1 extends Phaser.Scene {
 
     preload() {
         //Preload all used assets:
+
+        //Audios:
         this.load.audio("blastSound", "../sounds/explosion.mp3");
         this.load.audio("scoreSound", "../sounds/pickupCoin.mp3");
+
+        //Images:
+        this.load.image("spaceJunk", "../images/spaceJunk.png");
         this.load.image("player", "../images/player.png");
         this.load.image("asteroid", "../images/asteroid.png");
         this.load.image("heart", "../images/heart.png");
@@ -84,6 +89,12 @@ class Level1 extends Phaser.Scene {
             allowGravity: false,
         });
 
+        //Create spaceJunk group:
+        this.spaceJunkGroup = this.physics.add.group({
+            immovable: false,
+            allowGravity: false,
+        });
+
         //Add triggertimer for spawning asteroids and other game objects:
         this.triggerTimer = this.time.addEvent({
             callback: this.createAsteroids,
@@ -101,6 +112,7 @@ class Level1 extends Phaser.Scene {
         //Physics colliders:
         this.physics.add.collider(this.starsGroup, this.asteroidGroup);
         this.physics.add.collider(this.healthUpGroup, this.asteroidGroup);
+        this.physics.add.collider(this.spaceJunkGroup, this.player);
 
         //Physics overlaps:
         this.physics.add.overlap(
@@ -127,6 +139,46 @@ class Level1 extends Phaser.Scene {
             this.player,
             this.healthUpGroup,
             this.collectHealthUp,
+            null,
+            this
+        );
+
+        this.physics.add.overlap(
+            this.spaceJunkGroup,
+            this.asteroidGroup,
+            this.removeObject,
+            null,
+            this
+        );
+
+        this.physics.add.overlap(
+            this.healthUpGroup,
+            this.asteroidGroup,
+            this.removeObject,
+            null,
+            this
+        );
+
+        this.physics.add.overlap(
+            this.starsGroup,
+            this.asteroidGroup,
+            this.removeObject,
+            null,
+            this
+        );
+
+        this.physics.add.overlap(
+            this.starsGroup,
+            this.healthUpGroup,
+            this.removeObject,
+            null,
+            this
+        );
+
+        this.physics.add.overlap(
+            this.asteroidGroup,
+            this.asteroidGroup,
+            this.removeObject,
             null,
             this
         );
@@ -167,10 +219,34 @@ class Level1 extends Phaser.Scene {
             this.player.body.acceleration.y = 0;
         }
 
-        //Way to remove asteroids after they get out of bounds:
+        //Way to remove objects after they get out of bounds:
         this.asteroidGroup.children.iterate(function (asteroid) {
             if (asteroid && asteroid.y > game.config.height + asteroid.height) {
                 asteroid.destroy();
+            }
+        });
+
+        this.healthUpGroup.children.iterate(function (healthUp) {
+            if (healthUp && healthUp.y > game.config.height + healthUp.height) {
+                healthUp.destroy();
+            }
+        });
+
+        this.starsGroup.children.iterate(function (star) {
+            if (star && game.config.height + star.healthUp) {
+                star.destroy();
+            }
+        });
+
+        this.spaceJunkGroup.children.iterate(function (spaceJunk) {
+            if (
+                (spaceJunk &&
+                    spaceJunk.y > game.config.height + spaceJunk.height) ||
+                (spaceJunk && spaceJunk.y < -100) ||
+                (spaceJunk && spaceJunk.x > game.config.width + 100) ||
+                (spaceJunk && spaceJunk.x < -250)
+            ) {
+                spaceJunk.destroy();
             }
         });
     }
@@ -195,7 +271,7 @@ class Level1 extends Phaser.Scene {
         //Create potential stars;
         if (Phaser.Math.Between(0, 1)) {
             this.starsGroup
-                .create(Phaser.Math.Between(0, game.config.width), 0, "star")
+                .create(Phaser.Math.Between(0, game.config.width), -100, "star")
                 .setScale(0.06);
             this.starsGroup.setVelocityY(gameOptions.asteroidSpeed);
         }
@@ -203,13 +279,26 @@ class Level1 extends Phaser.Scene {
         //Create potential healthUps;
         if (Phaser.Math.Between(0, 40) === 5) {
             this.healthUpGroup
-                .create(Phaser.Math.Between(0, game.config.width), 0, "heart")
+                .create(
+                    Phaser.Math.Between(0, game.config.width),
+                    -100,
+                    "heart"
+                )
                 .setScale(0.6);
             this.healthUpGroup.setVelocityY(gameOptions.asteroidSpeed);
         }
 
-        //This function gets called every second, so we add 1 to time counter:
-        this.passedTime++;
+        //Create potential spaceJunk;
+        if (Phaser.Math.Between(0, 4) === 2) {
+            this.spaceJunkGroup
+                .create(
+                    Phaser.Math.Between(0, game.config.width),
+                    -100,
+                    "spaceJunk"
+                )
+                .setScale(0.3);
+            this.spaceJunkGroup.setVelocityY(gameOptions.asteroidSpeed);
+        }
 
         //Lower the delay:
         if (this.triggerTimer.delay > 400) {
@@ -245,6 +334,12 @@ class Level1 extends Phaser.Scene {
         this.playerHealth += 1;
         this.healthText.setText(this.playerHealth);
         this.scoreSound.play();
+    }
+
+    //Functio for removing objects when they get to of eachother:
+    removeObject(object1, object2) {
+        object1.destroy();
+        object2.destroy();
     }
 }
 
@@ -318,6 +413,11 @@ class MainMenu extends Phaser.Scene {
         super("MainMenu");
     }
 
+    preload() {
+        //Music:
+        this.load.audio("music", "../sounds/music.mp3");
+    }
+
     create() {
         //Main title
         this.add
@@ -343,6 +443,16 @@ class MainMenu extends Phaser.Scene {
         restartButton.on("pointerdown", () => {
             this.scene.start("LevelMenu");
         });
+
+        //Game music
+        if (!this.music) {
+            this.music = this.sound.add("music", {
+                loop: true,
+                volume: 0.2,
+            });
+
+            this.music.play();
+        }
     }
 }
 
@@ -428,8 +538,12 @@ class Level2 extends Phaser.Scene {
 
     preload() {
         //Preload all used assets:
+
+        //Sounds
         this.load.audio("blastSound", "../sounds/explosion.mp3");
         this.load.audio("scoreSound", "../sounds/pickupCoin.mp3");
+
+        //Images
         this.load.image("player", "../images/player.png");
         this.load.image("asteroid", "../images/asteroid.png");
         this.load.image("heart", "../images/heart.png");
@@ -556,10 +670,16 @@ class Level2 extends Phaser.Scene {
             this.player.body.acceleration.y = 0;
         }
 
-        //Way to remove asteroids after they get out of bounds:
+        //Way to remove things after they get out of bounds:
         this.asteroidGroup.children.iterate(function (asteroid) {
             if (asteroid && asteroid.y > game.config.height + asteroid.height) {
                 asteroid.destroy();
+            }
+        });
+
+        this.healthUpGroup.children.iterate(function (healthUp) {
+            if (healthUp && healthUp.y > game.config.height + healthUp.height) {
+                healthUp.destroy();
             }
         });
     }
